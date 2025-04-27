@@ -12,7 +12,9 @@ function Home() {
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>Home Page - Products</h1>
+      <h1>
+        Home Page - Products
+        </h1>
       {products.map((product) => (
         <div key={product.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
           <h3>{product.name}</h3>
