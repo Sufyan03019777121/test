@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config(); // <- Added dotenv
@@ -9,6 +8,11 @@ app.use(cors());
 app.use(express.json());
 
 let products = []; // memory mein rakhenge
+
+// Default route
+app.get("/", (req, res) => {
+  res.send("Backend is working!");
+});
 
 // Get all products
 app.get("/api/products", (req, res) => {
@@ -32,7 +36,3 @@ app.delete("/api/products/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-
-
-
-
