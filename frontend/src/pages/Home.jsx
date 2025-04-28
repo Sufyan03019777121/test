@@ -81,7 +81,7 @@ function Home() {
         />
      
        {/* call button  */}
-       <Button as={Link} to={`tel:/923094282079?text=Hello%2C%20I%20am%20interested%20in%20buying%20the%20Aloe%20Vera%20plant.%20Can%20you%20give%20me%20more%20details%3F"`} variant="primary mx-2 mt-3">call</Button>
+        <Button as={Link} to={`tel:/923094282079`} variant="primary mx-2 mt-3">call</Button>
 
         {/* Animation CSS */}
         <style>{`
