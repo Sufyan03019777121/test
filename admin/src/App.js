@@ -13,7 +13,7 @@ const App = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get('https://test-backend-t3bb.onrender.com/api/products');
       setProducts(response.data);
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -47,14 +47,14 @@ const App = () => {
 
     try {
       if (editMode) {
-        await axios.put(`http://localhost:5000/api/products/${editProductId}`, formData, {
+        await axios.put(`https://test-backend-t3bb.onrender.com/api/products/${editProductId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
         alert('Product updated successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/products', formData, {
+        await axios.post('https://test-backend-t3bb.onrender.com/api/products', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -84,16 +84,18 @@ const App = () => {
     setImage(null);
   };
 
+
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      const response = await axios.delete(`https://test-backend-t3bb.onrender.com/api/products/${id}`);
       alert('Product deleted successfully!');
-      fetchProducts();
+      fetchProducts(); // Update product list after deletion
     } catch (err) {
       console.error('Error deleting product:', err);
       alert('Failed to delete product');
     }
   };
+  
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -185,7 +187,7 @@ const App = () => {
                 <td>
                   {product.image && (
                     <img
-                      src={`http://localhost:5000/${product.image}`}
+                      src={`https://test-backend-t3bb.onrender.com/${product.image}`}
                       alt={product.name}
                       width="50"
                     />
