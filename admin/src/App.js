@@ -87,15 +87,16 @@ const App = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`https://test-backend-t3bb.onrender.com/api/products/${id}`);
+      await axios.delete(`https://test-backend-t3bb.onrender.com/api/products/${id}`);
       alert('Product deleted successfully!');
-      fetchProducts(); // Update product list after deletion
+      fetchProducts(); // پروڈکٹ کی فہرست کو اپ ڈیٹ کریں ڈیلیٹ کرنے کے بعد
     } catch (err) {
       console.error('Error deleting product:', err);
       alert('Failed to delete product');
     }
   };
-  
+
+
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -103,6 +104,16 @@ const App = () => {
 
   return (
     <div className="container mt-5">
+      <div className="py-5" style={{ background: 'linear-gradient(135deg, #4CAF50, #8BC34A)', color: 'white', textAlign: 'center', borderRadius: '12px', marginBottom: '30px' }}>
+        <h1 style={{ fontSize: '3rem', fontWeight: 'bold', letterSpacing: '2px' }}>
+          Daraz Nursery Admin Panel
+        </h1>
+        <p style={{ fontSize: '1.2rem', marginTop: '10px' }}>
+          Manage your plants with ease and beauty!
+        </p>
+      </div>
+
+
       <h2 className="text-center mb-4">{editMode ? 'Edit Product' : 'Add New Plant'}</h2>
 
       {/* Form to add/edit a product */}
@@ -182,7 +193,12 @@ const App = () => {
             filteredProducts.map(product => (
               <tr key={product._id}>
                 <td>{product.name}</td>
-                <td>{product.description}</td>
+                <td>
+                  {product.description.length > 20
+                    ? product.description.substring(0, 20) + '...'
+                    : product.description}
+                </td>
+
                 <td>{product.price}</td>
                 <td>
                   {product.image && (
