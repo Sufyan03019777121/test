@@ -47,8 +47,15 @@ function Details() {
               <p className="card-text">{product.description}</p>
               <h4 className="card-text text-success"> Rs. {product.price}</h4>
             </div>
-            {/* whatsapp button */}
-            <Button as={Link} to={`https://wa.me/923094282079?text=Hello%2C%20I%20am%20interested%20in%20buying%20the%20Aloe%20Vera%20plant.%20Can%20you%20give%20me%20more%20details%3F"`} variant="success mx-2 mt-3">whatsapp</Button>
+             {/* whatsapp button */}
+                    <Button
+                      as={Link}
+                      to={`https://wa.me/923094282079?text=%21%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%DB%8C%DA%A9%D9%85%20%D9%88%D8%B1%D8%AD%D9%85%DB%83%20%D8%A7%D9%84%D9%84%DB%81`}
+                      variant="success mx-2 mt-3"
+                    >
+                      WhatsApp
+                    </Button>
+
             {/* call button  */}
             <Button as={Link} to={`tel:/923094282079`} variant="primary mx-2 mt-3">call</Button>
           </div>
