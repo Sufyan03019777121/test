@@ -11,13 +11,15 @@ const App = () => {
   const [editMode, setEditMode] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state for products fetching
-  const [error, setError] = useState(''); // Error state for better error handling
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Updated BACKEND_URL
   const BACKEND_URL = 'https://test-backend-0voz.onrender.com';
 
-  // Fetch products with loading state and error handling
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   const fetchProducts = async () => {
     setLoading(true);
     setError('');
@@ -25,29 +27,26 @@ const App = () => {
       const response = await axios.get(`${BACKEND_URL}/api/products`);
       setProducts(response.data);
     } catch (err) {
-      console.error('Error fetching products:', err);
+      console.error(err);
       setError('Failed to fetch products');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setImage(file);
-    setPreviewImage(URL.createObjectURL(file));
+    if (file) {
+      setImage(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const priceValue = parseFloat(price);
-    if (isNaN(priceValue)) {
-      alert("Please enter a valid price.");
+    if (!name || !description || !price) {
+      alert("All fields are required.");
       return;
     }
 
@@ -55,7 +54,7 @@ const App = () => {
     if (image) formData.append('image', image);
     formData.append('name', name);
     formData.append('description', description);
-    formData.append('price', priceValue);
+    formData.append('price', price);
 
     try {
       if (editMode) {
@@ -69,12 +68,11 @@ const App = () => {
         });
         alert('Product uploaded successfully!');
       }
-
       resetForm();
       fetchProducts();
     } catch (err) {
-      console.error('Error uploading product:', err);
-      alert('Failed to upload or update product');
+      console.error(err);
+      alert('Failed to upload/update product');
     }
   };
 
@@ -83,6 +81,7 @@ const App = () => {
     setDescription('');
     setPrice('');
     setImage(null);
+    if (previewImage) URL.revokeObjectURL(previewImage);
     setPreviewImage(null);
     setEditMode(false);
     setEditProductId(null);
@@ -105,7 +104,7 @@ const App = () => {
       alert('Product deleted successfully!');
       fetchProducts();
     } catch (err) {
-      console.error('Error deleting product:', err);
+      console.error(err);
       alert('Failed to delete product');
     }
   };
@@ -116,14 +115,14 @@ const App = () => {
 
   return (
     <div className="container mt-5">
-      <div className="py-5" style={{ background: 'linear-gradient(135deg, #4CAF50, #8BC34A)', color: 'white', textAlign: 'center', borderRadius: '12px', marginBottom: '30px' }}>
-        <h1 style={{ fontSize: '3rem', fontWeight: 'bold' }}>Daraz Nursery Admin Panel</h1>
-        <p style={{ fontSize: '1.2rem' }}>Manage your plants with ease and beauty!</p>
+      <div className="py-5 text-white text-center rounded" style={{ background: 'linear-gradient(135deg, #4CAF50, #8BC34A)' }}>
+        <h1 className="display-4 fw-bold">Daraz Nursery Admin Panel</h1>
+        <p className="lead">Manage your plants with ease and beauty!</p>
       </div>
 
-      <h2 className="text-center mb-4">{editMode ? 'Edit Product' : 'Add New Plant'}</h2>
+      <h2 className="text-center mt-4">{editMode ? 'Edit Product' : 'Add New Plant'}</h2>
 
-      {error && <div className="alert alert-danger">{error}</div>} {/* Error message display */}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -141,18 +140,14 @@ const App = () => {
         <div className="mb-3">
           <label className="form-label">Upload Image</label>
           <input type="file" className="form-control" onChange={handleFileChange} />
-          {previewImage && (
-            <img src={previewImage} alt="Preview" className="mt-2" width="100" />
-          )}
+          {previewImage && <img src={previewImage} alt="Preview" className="mt-2" width="100" />}
         </div>
-        <button type="submit" className="btn btn-primary">
-          {editMode ? 'Update Product' : 'Upload Product'}
-        </button>
+        <button type="submit" className="btn btn-primary">{editMode ? 'Update Product' : 'Upload Product'}</button>
       </form>
 
       <h3 className="text-center mt-5">Products List</h3>
 
-      <div className="mb-4">
+      <div className="mb-3">
         <input
           type="text"
           className="form-control"
@@ -162,51 +157,44 @@ const App = () => {
         />
       </div>
 
-      {loading && <div className="text-center">Loading...</div>} {/* Loading indicator */}
-
-      <h4 className="text-center mt-3">Total Products: {filteredProducts.length}</h4>
-
-      <table className="table mt-4">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Image</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => (
-              <tr key={product._id}>
-                <td>{product.name}</td>
-                <td title={product.description}>
-                  {product.description.length > 20
-                    ? product.description.substring(0, 20) + '...'
-                    : product.description}
-                </td>
-                <td>{product.price}</td>
-                <td>
-                  {product.image && (
-                    <img
-                      src={`${BACKEND_URL}/${product.image}`}
-                      alt={product.name}
-                      width="50"
-                    />
-                  )}
-                </td>
-                <td>
-                  <button onClick={() => handleEdit(product)} className="btn btn-warning me-2">Edit</button>
-                  <button onClick={() => handleDelete(product._id)} className="btn btn-danger">Delete</button>
-                </td>
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : (
+        <>
+          <h5 className="text-center">Total Products: {filteredProducts.length}</h5>
+          <table className="table table-striped mt-3">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Image</th>
+                <th>Actions</th>
               </tr>
-            ))
-          ) : (
-            <tr><td colSpan="5" className="text-center">No products found.</td></tr>
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map(product => (
+                  <tr key={product._id}>
+                    <td>{product.name}</td>
+                    <td>{product.description.length > 20 ? product.description.substring(0, 20) + '...' : product.description}</td>
+                    <td>{product.price}</td>
+                    <td>
+                      <img src={`${BACKEND_URL}/${product.image}`} alt={product.name} width="50" />
+                    </td>
+                    <td>
+                      <button onClick={() => handleEdit(product)} className="btn btn-warning btn-sm me-2">Edit</button>
+                      <button onClick={() => handleDelete(product._id)} className="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan="5" className="text-center">No products found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </>
+      )}
     </div>
   );
 };

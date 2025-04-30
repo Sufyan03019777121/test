@@ -67,14 +67,13 @@ app.get("/api/products", async (req, res) => {
 app.post("/api/products", upload.single('image'), async (req, res) => {
   try {
     const { name, description, price } = req.body;
-    
-    // Ensure the image is properly uploaded
+
     if (!req.file) {
       return res.status(400).json({ message: "Image upload failed" });
     }
 
-    const image = req.file?.url; // Cloudinary image URL
-    const imagePublicId = req.file?.public_id; // Cloudinary public_id
+    const image = req.file.path; // ✅ Cloudinary image URL
+    const imagePublicId = req.file.filename; // ✅ Cloudinary public_id
 
     const newProduct = new Product({ name, description, price, image, imagePublicId });
     await newProduct.save();
@@ -128,8 +127,8 @@ app.put("/api/products/:id", upload.single('image'), async (req, res) => {
       if (product.imagePublicId) {
         await cloudinary.uploader.destroy(product.imagePublicId);
       }
-      updatedFields.image = req.file.url; // Cloudinary image URL
-      updatedFields.imagePublicId = req.file.public_id; // Cloudinary public_id
+      updatedFields.image = req.file.path; // ✅ Cloudinary image URL
+      updatedFields.imagePublicId = req.file.filename; // ✅ Cloudinary public_id
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
