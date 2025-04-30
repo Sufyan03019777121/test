@@ -1,18 +1,21 @@
-﻿# Node modules
+﻿# Node modules (admin, backend, frontend)
 **/node_modules/
 
-# Build folders
+# Build folders (React, others)
 **/build/
 
-# Environment files
+# Environment files (.env)
 **/.env
 
-# Backend uploads
+# Uploads folder (in backend)
 backend/uploads/
 
 # Log files
 **/*.log
 
-# OS/system files
+# OS-specific
 .DS_Store
 Thumbs.db
+
+# VSCode settings (optional)
+.vscode/
