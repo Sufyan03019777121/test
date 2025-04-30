@@ -1,98 +1,76 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+require("dotenv").config();
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-require("dotenv").config(); // dotenv for environment variables
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Use cors and json middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from 'uploads' folder
-app.use('/uploads', express.static('uploads'));
-
-// MongoDB connection
+// MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error(err));
 
-// Multer configuration (for image uploads)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadsDir = 'uploads/';
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-    // Check if uploads directory exists, create if it doesn't
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-    cb(null, uploadsDir);
+// Multer Cloudinary Storage
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'nursery-products',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+    transformation: [{ width: 500, height: 500, crop: "limit" }],
   },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
 });
 
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for file size
-});
+const upload = multer({ storage });
 
 // Product Schema
 const productSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  image: {
-    type: String,
-    required: false,
-  },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  price: { type: Number, required: true },
+  image: { type: String },
+  imagePublicId: { type: String }, // Cloudinary public_id
 });
 
-// Product Model
 const Product = mongoose.model('Product', productSchema);
 
-// Default route
+// Routes
 app.get("/", (req, res) => {
-  res.send("Backend is working!");
+  res.send("Backend is working with Cloudinary!");
 });
 
-// Get all products from MongoDB
+// Get all products
 app.get("/api/products", async (req, res) => {
   try {
-    const mongoProducts = await Product.find();
-    res.json(mongoProducts);
+    const products = await Product.find();
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Add new product (MongoDB based)
+// Add product
 app.post("/api/products", upload.single('image'), async (req, res) => {
   try {
     const { name, description, price } = req.body;
-    const image = req.file ? req.file.path : ''; // If image is provided
+    const image = req.file?.path;
+    const imagePublicId = req.file?.filename; // cloudinary public_id
 
-    const newProduct = new Product({
-      name,
-      description,
-      price,
-      image,
-    });
-
+    const newProduct = new Product({ name, description, price, image, imagePublicId });
     await newProduct.save();
     res.status(201).json(newProduct);
   } catch (error) {
@@ -101,26 +79,28 @@ app.post("/api/products", upload.single('image'), async (req, res) => {
   }
 });
 
-// Get a product by ID (MongoDB)
+// Get product by ID
 app.get("/api/products/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+    if (!product) return res.status(404).json({ message: "Product not found" });
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Delete a product (MongoDB)
+// Delete product (with Cloudinary image delete)
 app.delete("/api/products/:id", async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    // Delete image from Cloudinary
+    if (product.imagePublicId) {
+      await cloudinary.uploader.destroy(product.imagePublicId);
     }
+
     res.json({ message: "Product deleted" });
   } catch (error) {
     console.error(error);
@@ -128,21 +108,29 @@ app.delete("/api/products/:id", async (req, res) => {
   }
 });
 
-// Update product (MongoDB)
+// Update product
 app.put("/api/products/:id", upload.single('image'), async (req, res) => {
   try {
     const { name, description, price } = req.body;
-    const image = req.file ? req.file.path : ''; // New image path if exists
+    const updatedFields = { name, description, price };
+
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    if (req.file) {
+      // Delete old image from Cloudinary
+      if (product.imagePublicId) {
+        await cloudinary.uploader.destroy(product.imagePublicId);
+      }
+      updatedFields.image = req.file.path;
+      updatedFields.imagePublicId = req.file.filename;
+    }
 
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      { name, description, price, image },
-      { new: true } // To return the updated document
+      updatedFields,
+      { new: true }
     );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
 
     res.json(updatedProduct);
   } catch (error) {
@@ -151,7 +139,6 @@ app.put("/api/products/:id", upload.single('image'), async (req, res) => {
   }
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

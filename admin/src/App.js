@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const App = () => {
   const [image, setImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -11,9 +12,11 @@ const App = () => {
   const [editProductId, setEditProductId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const BACKEND_URL = 'https://test-backend-t3bb.onrender.com';
+
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('https://test-backend-t3bb.onrender.com/api/products');
+      const response = await axios.get(`${BACKEND_URL}/api/products`);
       setProducts(response.data);
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -26,53 +29,55 @@ const App = () => {
   }, []);
 
   const handleFileChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    setImage(file);
+    setPreviewImage(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const priceValue = parseFloat(price);
-
     if (isNaN(priceValue)) {
       alert("Please enter a valid price.");
       return;
     }
 
     const formData = new FormData();
-    formData.append('image', image);
+    if (image) formData.append('image', image);
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', priceValue);
 
     try {
       if (editMode) {
-        await axios.put(`https://test-backend-t3bb.onrender.com/api/products/${editProductId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        await axios.put(`${BACKEND_URL}/api/products/${editProductId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
         alert('Product updated successfully!');
       } else {
-        await axios.post('https://test-backend-t3bb.onrender.com/api/products', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        await axios.post(`${BACKEND_URL}/api/products`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
         alert('Product uploaded successfully!');
       }
 
-      setName('');
-      setDescription('');
-      setPrice('');
-      setImage(null);
-      setEditMode(false);
-      setEditProductId(null);
+      resetForm();
       fetchProducts();
     } catch (err) {
       console.error('Error uploading product:', err);
       alert('Failed to upload or update product');
     }
+  };
+
+  const resetForm = () => {
+    setName('');
+    setDescription('');
+    setPrice('');
+    setImage(null);
+    setPreviewImage(null);
+    setEditMode(false);
+    setEditProductId(null);
   };
 
   const handleEdit = (product) => {
@@ -81,22 +86,21 @@ const App = () => {
     setName(product.name);
     setDescription(product.description);
     setPrice(product.price);
+    setPreviewImage(`${BACKEND_URL}/${product.image}`);
     setImage(null);
   };
 
-
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure to delete this product?")) return;
     try {
-      await axios.delete(`https://test-backend-t3bb.onrender.com/api/products/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/products/${id}`);
       alert('Product deleted successfully!');
-      fetchProducts(); // پروڈکٹ کی فہرست کو اپ ڈیٹ کریں ڈیلیٹ کرنے کے بعد
+      fetchProducts();
     } catch (err) {
       console.error('Error deleting product:', err);
       alert('Failed to delete product');
     }
   };
-
-
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -105,55 +109,31 @@ const App = () => {
   return (
     <div className="container mt-5">
       <div className="py-5" style={{ background: 'linear-gradient(135deg, #4CAF50, #8BC34A)', color: 'white', textAlign: 'center', borderRadius: '12px', marginBottom: '30px' }}>
-        <h1 style={{ fontSize: '3rem', fontWeight: 'bold', letterSpacing: '2px' }}>
-          Daraz Nursery Admin Panel
-        </h1>
-        <p style={{ fontSize: '1.2rem', marginTop: '10px' }}>
-          Manage your plants with ease and beauty!
-        </p>
+        <h1 style={{ fontSize: '3rem', fontWeight: 'bold' }}>Daraz Nursery Admin Panel</h1>
+        <p style={{ fontSize: '1.2rem' }}>Manage your plants with ease and beauty!</p>
       </div>
-
 
       <h2 className="text-center mb-4">{editMode ? 'Edit Product' : 'Add New Plant'}</h2>
 
-      {/* Form to add/edit a product */}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Product Name</label>
-          <input
-            type="text"
-            className="form-control"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+          <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <div className="mb-3">
           <label className="form-label">Description</label>
-          <textarea
-            className="form-control"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
+          <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} required />
         </div>
         <div className="mb-3">
           <label className="form-label">Price</label>
-          <input
-            type="number"
-            className="form-control"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-          />
+          <input type="number" className="form-control" value={price} onChange={(e) => setPrice(e.target.value)} required />
         </div>
         <div className="mb-3">
           <label className="form-label">Upload Image</label>
-          <input
-            type="file"
-            className="form-control"
-            onChange={handleFileChange}
-          />
+          <input type="file" className="form-control" onChange={handleFileChange} />
+          {previewImage && (
+            <img src={previewImage} alt="Preview" className="mt-2" width="100" />
+          )}
         </div>
         <button type="submit" className="btn btn-primary">
           {editMode ? 'Update Product' : 'Upload Product'}
@@ -162,7 +142,6 @@ const App = () => {
 
       <h3 className="text-center mt-5">Products List</h3>
 
-      {/* Search Bar */}
       <div className="mb-4">
         <input
           type="text"
@@ -173,10 +152,7 @@ const App = () => {
         />
       </div>
 
-      {/* Total Products */}
-      <h4 className="text-center mt-3">
-        Total Products: {filteredProducts.length}
-      </h4>
+      <h4 className="text-center mt-3">Total Products: {filteredProducts.length}</h4>
 
       <table className="table mt-4">
         <thead>
@@ -193,42 +169,29 @@ const App = () => {
             filteredProducts.map(product => (
               <tr key={product._id}>
                 <td>{product.name}</td>
-                <td>
+                <td title={product.description}>
                   {product.description.length > 20
                     ? product.description.substring(0, 20) + '...'
                     : product.description}
                 </td>
-
                 <td>{product.price}</td>
                 <td>
                   {product.image && (
                     <img
-                      src={`https://test-backend-t3bb.onrender.com/${product.image}`}
+                      src={`${BACKEND_URL}/${product.image}`}
                       alt={product.name}
                       width="50"
                     />
                   )}
                 </td>
                 <td>
-                  <button
-                    onClick={() => handleEdit(product)}
-                    className="btn btn-warning me-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(product._id)}
-                    className="btn btn-danger"
-                  >
-                    Delete
-                  </button>
+                  <button onClick={() => handleEdit(product)} className="btn btn-warning me-2">Edit</button>
+                  <button onClick={() => handleDelete(product._id)} className="btn btn-danger">Delete</button>
                 </td>
               </tr>
             ))
           ) : (
-            <tr>
-              <td colSpan="5" className="text-center">No products found.</td>
-            </tr>
+            <tr><td colSpan="5" className="text-center">No products found.</td></tr>
           )}
         </tbody>
       </table>
