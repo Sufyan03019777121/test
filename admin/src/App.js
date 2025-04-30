@@ -11,16 +11,24 @@ const App = () => {
   const [editMode, setEditMode] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state for products fetching
+  const [error, setError] = useState(''); // Error state for better error handling
 
-  const BACKEND_URL = 'https://test-backend-t3bb.onrender.com';
+  // Updated BACKEND_URL
+  const BACKEND_URL = 'https://test-backend-0voz.onrender.com';
 
+  // Fetch products with loading state and error handling
   const fetchProducts = async () => {
+    setLoading(true);
+    setError('');
     try {
       const response = await axios.get(`${BACKEND_URL}/api/products`);
       setProducts(response.data);
     } catch (err) {
       console.error('Error fetching products:', err);
-      alert('Failed to fetch products');
+      setError('Failed to fetch products');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,6 +123,8 @@ const App = () => {
 
       <h2 className="text-center mb-4">{editMode ? 'Edit Product' : 'Add New Plant'}</h2>
 
+      {error && <div className="alert alert-danger">{error}</div>} {/* Error message display */}
+
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Product Name</label>
@@ -151,6 +161,8 @@ const App = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+
+      {loading && <div className="text-center">Loading...</div>} {/* Loading indicator */}
 
       <h4 className="text-center mt-3">Total Products: {filteredProducts.length}</h4>
 

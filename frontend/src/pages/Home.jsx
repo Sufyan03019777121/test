@@ -12,7 +12,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("https://test-backend-t3bb.onrender.com/api/products")
+    axios.get("https://test-backend-0voz.onrender.com/api/products")  // Updated backend URL
       .then(res => {
         setProducts(res.data);
         setLoading(false); // Data loaded, set loading to false
@@ -78,10 +78,10 @@ function Home() {
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div className="col-md-4 mb-4" key={product._id}>
-                <div className="card h-100">
+                <div className="card h-100 shadow-sm">
                   {product.image && (
                     <img
-                      src={`https://test-backend-t3bb.onrender.com/${product.image}`}
+                      src={`https://test-backend-0voz.onrender.com/${product.image}`}  // Updated image URL
                       className="card-img-top"
                       alt={product.name}
                       style={{ height: "250px", objectFit: "cover" }}

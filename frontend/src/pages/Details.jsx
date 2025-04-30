@@ -12,7 +12,7 @@ function Details() {
   useEffect(() => {
     setLoading(true); // Set loading to true when starting API request
     axios
-      .get(`https://test-backend-t3bb.onrender.com/api/products/${id}`)
+      .get(`https://test-backend-0voz.onrender.com/api/products/${id}`) // Updated backend URL
       .then((res) => {
         setProduct(res.data);
         setLoading(false); // Set loading to false when data is fetched
@@ -43,7 +43,7 @@ function Details() {
           <div className="col-md-6">
             {product.image && (
               <img
-                src={`https://test-backend-t3bb.onrender.com/${product.image}`}
+                src={`https://test-backend-0voz.onrender.com/${product.image}`} // Updated image URL
                 className="img-fluid rounded-start"
                 alt={product.name}
                 style={{ height: "100%", objectFit: "cover" }}
