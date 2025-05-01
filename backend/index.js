@@ -66,23 +66,27 @@ app.get("/api/products", async (req, res) => {
 // Add product
 app.post("/api/products", upload.single('image'), async (req, res) => {
   try {
+    console.log("req.body:", req.body); // 👈 دیکھیں ڈیٹا آ رہا ہے؟
+    console.log("req.file:", req.file); // 👈 یہ null یا undefined ہے؟
+
     const { name, description, price } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ message: "Image upload failed" });
     }
 
-    const image = req.file.path; // ✅ Cloudinary image URL
-    const imagePublicId = req.file.filename; // ✅ Cloudinary public_id
+    const image = req.file.path;
+    const imagePublicId = req.file.filename;
 
     const newProduct = new Product({ name, description, price, image, imagePublicId });
     await newProduct.save();
     res.status(201).json(newProduct);
   } catch (error) {
-    console.error(error);
+    console.error("Upload Error:", error);
     res.status(500).json({ message: "Error uploading product", error: error.message });
   }
 });
+
 
 // Get product by ID
 app.get("/api/products/:id", async (req, res) => {
