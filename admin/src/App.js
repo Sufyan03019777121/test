@@ -51,7 +51,13 @@ const App = () => {
     }
 
     const formData = new FormData();
-    if (image) formData.append('image', image);
+    if (image) {
+      formData.append('image', image);
+    } else {
+      alert("Please upload an image.");
+      return;
+    }
+
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', price);
@@ -61,18 +67,18 @@ const App = () => {
         await axios.put(`${BACKEND_URL}/api/products/${editProductId}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        alert('Product updated successfully!');
+        alert("Product updated successfully!");
       } else {
         await axios.post(`${BACKEND_URL}/api/products`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        alert('Product uploaded successfully!');
+        alert("Product uploaded successfully!");
       }
-      resetForm();
       fetchProducts();
+      resetForm();
     } catch (err) {
       console.error(err);
-      alert('Failed to upload/update product');
+      alert("Upload/update failed");
     }
   };
 
