@@ -16,6 +16,9 @@ const App = () => {
 
   const BACKEND_URL = 'https://test-backend-0voz.onrender.com';
 
+  // Set the default base URL for axios
+  axios.defaults.baseURL = BACKEND_URL;
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -24,7 +27,7 @@ const App = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/products`);
+      const response = await axios.get('/api/products');
       setProducts(response.data);
     } catch (err) {
       console.error(err);
@@ -64,14 +67,10 @@ const App = () => {
 
     try {
       if (editMode) {
-        await axios.put(`${BACKEND_URL}/api/products/${editProductId}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        await axios.put(`/api/products/${editProductId}`, formData);
         alert("Product updated successfully!");
       } else {
-        await axios.post(`${BACKEND_URL}/api/products`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        await axios.post('/api/products', formData);
         alert("Product uploaded successfully!");
       }
       fetchProducts();
@@ -87,7 +86,7 @@ const App = () => {
     setDescription('');
     setPrice('');
     setImage(null);
-    if (previewImage) URL.revokeObjectURL(previewImage);
+    if (previewImage) URL.revokeObjectURL(previewImage);  // Revoke URL when resetting form
     setPreviewImage(null);
     setEditMode(false);
     setEditProductId(null);
@@ -106,7 +105,7 @@ const App = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure to delete this product?")) return;
     try {
-      await axios.delete(`${BACKEND_URL}/api/products/${id}`);
+      await axios.delete(`/api/products/${id}`);
       alert('Product deleted successfully!');
       fetchProducts();
     } catch (err) {
