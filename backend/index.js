@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+require('dotenv').config();
 
 const app = express();
 const PORT = 5000;
