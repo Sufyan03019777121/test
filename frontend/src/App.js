@@ -1,118 +1,72 @@
-// import React from "react";
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import Home from "./pages/Home";
-// import Details from "./pages/Details";
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="/product/:id" element={<Details />} /> {/* درست روٹ */}
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 import axios from 'axios';
 
-const ProductForm = ({ onProductAdded }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    image: null,
-  });
-  const [imagePreview, setImagePreview] = useState(null);
-  const [loading, setLoading] = useState(false);
+const App = () => {
+  const [products, setProducts] = useState([]);
+  const [productDetail, setProductDetail] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    axios.get('http://localhost:5000/products')
+      .then(response => setProducts(response.data))
+      .catch(err => console.log(err));
+  }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setFormData({ ...formData, image: file });
-    setImagePreview(URL.createObjectURL(file));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Step 1: Upload image to Cloudinary
-      const imgData = new FormData();
-      imgData.append('image', formData.image);
-
-      const uploadRes = await axios.post('http://localhost:5000/api/upload', imgData);
-      const imageUrl = uploadRes.data.imageUrl;
-
-      // Step 2: Save product to MongoDB
-      const productData = {
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        imageUrl: imageUrl,
-      };
-
-      const productRes = await axios.post('http://localhost:5000/api/products', productData);
-
-      onProductAdded(productRes.data); // Pass to parent
-      setFormData({ name: '', description: '', price: '', image: null });
-      setImagePreview(null);
-    } catch (error) {
-      console.error('Error uploading:', error);
-      alert('Something went wrong!');
-    } finally {
-      setLoading(false);
-    }
+  const showProductDetail = (productId) => {
+    const product = products.find(p => p._id === productId);
+    setProductDetail(product);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="name"
-        placeholder="Product Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-      />
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={formData.description}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="number"
-        name="price"
-        placeholder="Price"
-        value={formData.price}
-        onChange={handleChange}
-        required
-      />
-      <input type="file" onChange={handleImageChange} accept="image/*" required />
+    <div className="container my-5">
+      <h1 className="text-center mb-4">🌱 Product List</h1>
 
-      {imagePreview && (
-        <img
-          src={imagePreview}
-          alt="Preview"
-          style={{ width: '100px', height: '100px', objectFit: 'cover', marginTop: '10px' }}
-        />
+      <div className="row">
+        {products.map(product => (
+          <div className="col-md-4 mb-4" key={product._id}>
+            <div className="card h-100 shadow-sm">
+              <img
+                src={product.image}
+                alt={product.title}
+                className="card-img-top"
+                style={{ height: '200px', objectFit: 'cover' }}
+              />
+              <div className="card-body">
+                <h5 className="card-title">{product.title}</h5>
+                <p className="card-text">{product.description.slice(0, 80)}...</p>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => showProductDetail(product._id)}
+                >
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {productDetail && (
+        <div className="mt-5">
+          <h2 className="text-center mb-4">📝 Product Details</h2>
+          <div className="card mx-auto" style={{ maxWidth: '600px' }}>
+            <img
+              src={productDetail.image}
+              alt={productDetail.title}
+              className="card-img-top"
+              style={{ height: '300px', objectFit: 'cover' }}
+            />
+            <div className="card-body">
+              <h5 className="card-title">{productDetail.title}</h5>
+              <p className="card-text">{productDetail.description}</p>
+              <p className="card-text fw-bold">💰 Price: Rs. {productDetail.price}</p>
+            </div>
+          </div>
+        </div>
       )}
-
-      <button type="submit" disabled={loading}>
-        {loading ? 'Uploading...' : 'Add Product'}
-      </button>
-    </form>
+    </div>
   );
 };
 
-export default ProductForm;
+export default App;
