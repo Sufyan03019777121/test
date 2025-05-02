@@ -15,9 +15,6 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
-.then(() => console.log('✅ MongoDB connected'))
-.catch(err => console.error('❌ MongoDB Error:', err));
-
 // ✅ Product Schema
 const Product = mongoose.model('Product', new mongoose.Schema({
   name: { type: String, required: true },
