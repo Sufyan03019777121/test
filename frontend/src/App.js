@@ -49,7 +49,7 @@ const ProductForm = ({ onProductAdded }) => {
       const imgData = new FormData();
       imgData.append('image', formData.image);
 
-      const uploadRes = await axios.post('http://localhost:5000/api/upload', imgData);
+      const uploadRes = await axios.post('https://test-backend-a8x0.onrender.com/api/upload', imgData);
       const imageUrl = uploadRes.data.imageUrl;
 
       // Step 2: Save product to MongoDB
@@ -60,7 +60,7 @@ const ProductForm = ({ onProductAdded }) => {
         imageUrl: imageUrl,
       };
 
-      const productRes = await axios.post('http://localhost:5000/api/products', productData);
+      const productRes = await axios.post('https://test-backend-a8x0.onrender.com/api/products', productData);
 
       onProductAdded(productRes.data); // Pass to parent
       setFormData({ name: '', description: '', price: '', image: null });
