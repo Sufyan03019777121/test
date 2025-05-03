@@ -28,7 +28,7 @@ const Admin = () => {
     formData.append('image', product.image);
 
     try {
-      await axios.post('http://localhost:5000/add-product', formData, {
+      await axios.post('https://test-backend-qpjr.onrender.com/add-product', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('✅ Product added successfully');
