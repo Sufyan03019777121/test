@@ -8,7 +8,7 @@ const App = () => {
   const [productDetail, setProductDetail] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/products')
+    axios.get('http://https://test-backend-qpjr.onrender.com/products')
       .then(response => setProducts(response.data))
       .catch(err => console.log(err));
   }, []);
