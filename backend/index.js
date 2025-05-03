@@ -31,6 +31,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Debug log to check Cloudinary connection
+console.log('Cloudinary Config:', cloudinary.config());
+
 // ✅ Multer config (local temp storage)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, './uploads/'),
@@ -55,6 +58,7 @@ app.post('/add-product', upload.single('image'), async (req, res) => {
       return res.status(400).json({ message: "❌ No image file uploaded" });
     }
 
+    // Upload image to Cloudinary
     const uploadedImage = await cloudinary.uploader.upload(req.file.path);
 
     const newProduct = new Product({
