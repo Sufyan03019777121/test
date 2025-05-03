@@ -4,15 +4,26 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cors = require('cors'); // 👉 CORS added
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// MongoDB connection (Updated: removed useUnifiedTopology)
+// ✅ CORS middleware setup
+app.use(cors({
+  origin: 'https://test-admin-hvx3.onrender.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
-
 
 // Cloudinary configuration
 cloudinary.config({
@@ -21,18 +32,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Multer configuration for local file uploads (used before uploading to Cloudinary)
+// Multer local storage setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, './uploads/'),
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
 });
 const upload = multer({ storage });
 
-// Mongoose Product model
+// Mongoose model
 const Product = mongoose.model('Product', {
   title: String,
   description: String,
@@ -40,7 +47,7 @@ const Product = mongoose.model('Product', {
   image: String,
 });
 
-// POST: Add Product API
+// POST: Add Product
 app.post('/add-product', upload.single('image'), async (req, res) => {
   const { title, description, price } = req.body;
 
@@ -50,7 +57,7 @@ app.post('/add-product', upload.single('image'), async (req, res) => {
       title,
       description,
       price,
-      image: uploadedImage.secure_url, // secure_url is recommended
+      image: uploadedImage.secure_url,
     });
 
     await newProduct.save();
@@ -61,7 +68,7 @@ app.post('/add-product', upload.single('image'), async (req, res) => {
   }
 });
 
-// GET: Get All Products
+// GET: All Products
 app.get('/products', async (req, res) => {
   try {
     const products = await Product.find();
@@ -71,9 +78,7 @@ app.get('/products', async (req, res) => {
   }
 });
 
-
-
-// Start Server
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
