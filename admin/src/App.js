@@ -8,27 +8,27 @@ function Admin() {
 
   // Fetch all products
   const fetchProducts = async () => {
-    const res = await axios.get('http://localhost:5000/products');
+    const res = await axios.get('https://demo-backend-ti0w.onrender.com/products');
     setProducts(res.data);
   };
 
   // Add new product
   const addProduct = async () => {
-    await axios.post('http://localhost:5000/add-product', newProduct);
+    await axios.post('https://demo-backend-ti0w.onrender.com/add-product', newProduct);
     fetchProducts(); // Reload products list
     setNewProduct({ title: '', description: '', price: '', image: '' }); // Reset form
   };
 
   // Edit product
   const updateProduct = async () => {
-    await axios.put(`http://localhost:5000/edit-product/${editProduct.id}`, editProduct);
+    await axios.put(`https://demo-backend-ti0w.onrender.com/edit-product/${editProduct.id}`, editProduct);
     fetchProducts();
     setEditProduct(null); // Reset edit state
   };
 
   // Delete product
   const deleteProduct = async (id) => {
-    await axios.delete(`http://localhost:5000/delete-product/${id}`);
+    await axios.delete(`https://demo-backend-ti0w.onrender.com/delete-product/${id}`);
     fetchProducts(); // Reload products list
   };
 
