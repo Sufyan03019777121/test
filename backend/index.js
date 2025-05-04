@@ -1,92 +1,51 @@
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
+require('dotenv').config(); // Load .env variables
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000; // Use PORT from .env
 
-// ✅ CORS middleware
-app.use(cors({
-  origin: 'https://test-admin-hvx3.onrender.com',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
-
-// ✅ Express middleware
+// Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
-// ✅ MongoDB connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+// Dummy Products
+let products = [
+  { id: 1, title: 'Plant A', description: 'A nice plant', price: 100, image: 'imageA.jpg' },
+  { id: 2, title: 'Plant B', description: 'Another nice plant', price: 150, image: 'imageB.jpg' },
+];
 
-// ✅ Cloudinary config
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+// Routes
+app.get('/products', (req, res) => {
+  res.json(products);
 });
 
-// Debug log to check Cloudinary connection
-console.log('Cloudinary Config:', cloudinary.config());
-
-// ✅ Multer config (local temp storage)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, './uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
-});
-const upload = multer({ storage });
-
-// ✅ Mongoose model
-const Product = mongoose.model('Product', {
-  title: String,
-  description: String,
-  price: Number,
-  image: String,
+app.post('/add-product', (req, res) => {
+  const { title, description, price, image } = req.body;
+  const newProduct = { id: products.length + 1, title, description, price, image };
+  products.push(newProduct);
+  res.json(newProduct);
 });
 
-// ✅ POST: Add Product
-app.post('/add-product', upload.single('image'), async (req, res) => {
-  const { title, description, price } = req.body;
-
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "❌ No image file uploaded" });
-    }
-
-    // Upload image to Cloudinary
-    const uploadedImage = await cloudinary.uploader.upload(req.file.path);
-
-    const newProduct = new Product({
-      title,
-      description,
-      price,
-      image: uploadedImage.secure_url,
-    });
-
-    await newProduct.save();
-    res.status(201).json(newProduct);
-  } catch (error) {
-    console.error('❌ Upload error:', error);
-    res.status(500).json({ message: "Product not added", error: error.message });
+app.put('/edit-product/:id', (req, res) => {
+  const { id } = req.params;
+  const { title, description, price, image } = req.body;
+  let product = products.find(p => p.id == id);
+  if (product) {
+    product = { ...product, title, description, price, image };
+    products = products.map(p => (p.id == id ? product : p));
+    res.json(product);
+  } else {
+    res.status(404).json({ message: 'Product not found' });
   }
 });
 
-// ✅ GET: All Products
-app.get('/products', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: "Unable to fetch products", error: error.message });
-  }
+app.delete('/delete-product/:id', (req, res) => {
+  const { id } = req.params;
+  products = products.filter(p => p.id != id);
+  res.status(200).json({ message: 'Product deleted' });
 });
 
-// ✅ Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`✅ Backend running at http://localhost:${port}`);
 });
