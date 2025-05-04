@@ -1,105 +1,111 @@
 import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 
-const Admin = () => {
-  const [product, setProduct] = useState({
-    title: '',
-    description: '',
-    price: '',
-    image: null
-  });
+function Admin() {
+  const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image: '' });
+  const [editProduct, setEditProduct] = useState(null);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
+  // Fetch all products
+  const fetchProducts = async () => {
+    const res = await axios.get('http://localhost:5000/products');
+    setProducts(res.data);
   };
 
-  const handleFileChange = (e) => {
-    setProduct({ ...product, image: e.target.files[0] });
+  // Add new product
+  const addProduct = async () => {
+    await axios.post('http://localhost:5000/add-product', newProduct);
+    fetchProducts(); // Reload products list
+    setNewProduct({ title: '', description: '', price: '', image: '' }); // Reset form
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', product.title);
-    formData.append('description', product.description);
-    formData.append('price', product.price);
-    formData.append('image', product.image);
+  // Edit product
+  const updateProduct = async () => {
+    await axios.put(`http://localhost:5000/edit-product/${editProduct.id}`, editProduct);
+    fetchProducts();
+    setEditProduct(null); // Reset edit state
+  };
 
-    try {
-      await axios.post('https://test-backend-qpjr.onrender.com/add-product', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      alert('✅ Product added successfully');
-      setProduct({ title: '', description: '', price: '', image: null });
-    } catch (error) {
-      console.log(error);
-      alert('❌ Failed to add product');
-    }
+  // Delete product
+  const deleteProduct = async (id) => {
+    await axios.delete(`http://localhost:5000/delete-product/${id}`);
+    fetchProducts(); // Reload products list
   };
 
   return (
-    <div className="container mt-5">
-      <div className="card shadow-lg p-4">
-        <h2 className="text-center mb-4">Add New Product</h2>
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <div className="mb-3">
-            <label className="form-label">Title</label>
-            <input
-              type="text"
-              name="title"
-              className="form-control"
-              value={product.title}
-              onChange={handleInputChange}
-              placeholder="Enter product title"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Description</label>
-            <textarea
-              name="description"
-              className="form-control"
-              value={product.description}
-              onChange={handleInputChange}
-              rows="3"
-              placeholder="Enter product description"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Price</label>
-            <input
-              type="number"
-              name="price"
-              className="form-control"
-              value={product.price}
-              onChange={handleInputChange}
-              placeholder="Enter product price"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="form-label">Image</label>
-            <input
-              type="file"
-              name="image"
-              className="form-control"
-              onChange={handleFileChange}
-              accept="image/*"
-              required
-            />
-          </div>
-          <div className="text-center">
-            <button type="submit" className="btn btn-primary px-4">
-              Add Product
-            </button>
-          </div>
-        </form>
-      </div>
+    <div>
+      <h1>Admin Panel</h1>
+
+      {/* Add New Product Form */}
+      <h2>Add Product</h2>
+      <input
+        type="text"
+        placeholder="Title"
+        value={newProduct.title}
+        onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Description"
+        value={newProduct.description}
+        onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+      />
+      <input
+        type="number"
+        placeholder="Price"
+        value={newProduct.price}
+        onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Image"
+        value={newProduct.image}
+        onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+      />
+      <button onClick={addProduct}>Add Product</button>
+
+      {/* Edit Product Form */}
+      {editProduct && (
+        <div>
+          <h2>Edit Product</h2>
+          <input
+            type="text"
+            value={editProduct.title}
+            onChange={(e) => setEditProduct({ ...editProduct, title: e.target.value })}
+          />
+          <input
+            type="text"
+            value={editProduct.description}
+            onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
+          />
+          <input
+            type="number"
+            value={editProduct.price}
+            onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
+          />
+          <input
+            type="text"
+            value={editProduct.image}
+            onChange={(e) => setEditProduct({ ...editProduct, image: e.target.value })}
+          />
+          <button onClick={updateProduct}>Update Product</button>
+        </div>
+      )}
+
+      {/* Display Products */}
+      <h2>Product List</h2>
+      {products.map((product) => (
+        <div key={product.id}>
+          <h3>{product.title}</h3>
+          <p>{product.description}</p>
+          <p>${product.price}</p>
+          <img src={product.image} alt={product.title} style={{ width: '100px' }} />
+          <button onClick={() => deleteProduct(product.id)}>Delete</button>
+          <button onClick={() => setEditProduct(product)}>Edit</button>
+        </div>
+      ))}
     </div>
   );
-};
+}
 
 export default Admin;
