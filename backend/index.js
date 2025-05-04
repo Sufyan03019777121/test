@@ -1,51 +1,73 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config(); // Load .env variables
 
 const app = express();
-const port = process.env.PORT || 5000; // Use PORT from .env
+const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
 app.use(cors());
 
-// Dummy Products
-let products = [
-  { id: 1, title: 'Plant A', description: 'A nice plant', price: 100, image: 'imageA.jpg' },
-  { id: 2, title: 'Plant B', description: 'Another nice plant', price: 150, image: 'imageB.jpg' },
-];
+// ✅ MongoDB Connection
+mongoose
+  .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('✅ Connected to MongoDB Atlas'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// Routes
-app.get('/products', (req, res) => {
+// ✅ Product Schema
+const productSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  price: Number,
+  image: String,
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+// ✅ Routes
+
+// Get all products
+app.get('/products', async (req, res) => {
+  const products = await Product.find();
   res.json(products);
 });
 
-app.post('/add-product', (req, res) => {
+// Add new product
+app.post('/add-product', async (req, res) => {
   const { title, description, price, image } = req.body;
-  const newProduct = { id: products.length + 1, title, description, price, image };
-  products.push(newProduct);
+  const newProduct = new Product({ title, description, price, image });
+  await newProduct.save();
   res.json(newProduct);
 });
 
-app.put('/edit-product/:id', (req, res) => {
+// Edit product
+app.put('/edit-product/:id', async (req, res) => {
   const { id } = req.params;
   const { title, description, price, image } = req.body;
-  let product = products.find(p => p.id == id);
-  if (product) {
-    product = { ...product, title, description, price, image };
-    products = products.map(p => (p.id == id ? product : p));
-    res.json(product);
-  } else {
-    res.status(404).json({ message: 'Product not found' });
+  const updatedProduct = await Product.findByIdAndUpdate(
+    id,
+    { title, description, price, image },
+    { new: true }
+  );
+  if (!updatedProduct) {
+    return res.status(404).json({ message: 'Product not found' });
   }
+  res.json(updatedProduct);
 });
 
-app.delete('/delete-product/:id', (req, res) => {
+// Delete product
+app.delete('/delete-product/:id', async (req, res) => {
   const { id } = req.params;
-  products = products.filter(p => p.id != id);
-  res.status(200).json({ message: 'Product deleted' });
+  const deleted = await Product.findByIdAndDelete(id);
+  if (!deleted) {
+    return res.status(404).json({ message: 'Product not found' });
+  }
+  res.json({ message: 'Product deleted' });
 });
 
+// Start server
 app.listen(port, () => {
   console.log(`✅ Backend running at http://localhost:${port}`);
 });
