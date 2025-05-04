@@ -6,7 +6,7 @@ function App() {
 
   // Fetch products from backend
   const fetchProducts = async () => {
-    const res = await axios.get('http://localhost:5000/products');
+    const res = await axios.get('https://demo-backend-ti0w.onrender.com/products');
     setProducts(res.data);
   };
 
