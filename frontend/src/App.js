@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import ProductDetail from './pages/ProductDetail';
 
 function App() {
   const [products, setProducts] = useState([]);
 
-  // Fetch products from backend
   const fetchProducts = async () => {
-    const res = await axios.get('https://demo-backend-ti0w.onrender.com/products');
-    setProducts(res.data);
+    try {
+      const res = await axios.get('https://demo-backend-ti0w.onrender.com/products');
+      setProducts(res.data);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+    }
   };
 
   useEffect(() => {
@@ -15,19 +22,12 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <h1>Product List</h1>
-      <div className="product-cards">
-        {products.map((product) => (
-          <div key={product.id} className="card">
-            <img src={product.image} alt={product.title} style={{ width: '100px' }} />
-            <h3>{product.title}</h3>
-            <p>{product.description}</p>
-            <p>${product.price}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home products={products} />} />
+        <Route path="/product/:id" element={<ProductDetail products={products} />} />
+      </Routes>
+    </Router>
   );
 }
 
