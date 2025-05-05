@@ -33,10 +33,12 @@ function Home() {
   );
 
   return (
-    <div className="container pb-5 " >
+    <div   className="container pb-5 pt-3 bg-light " >
       {/* Header */}
-      <div className="mt-3 px-3 d-flex border justify-content-between align-items-center mb-4">
-        <h2 className="text-success pt-2">  <FaLeaf /> DarzNursery</h2>
+      <div className="px-3 d-flex border justify-content-between align-items-center mb-4"
+      style={{ backgroundColor: "#eafdea"}}
+       >
+        <h2 className="text-success pt-2">  🌿 NS_Nursery</h2>
         <div className="d-flex gap-3">
           <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔"
             target="_blank" rel="noopener noreferrer">
@@ -57,18 +59,21 @@ function Home() {
       </div>
 
       {/* Product Cards */}
-      <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4">
+      <div className="  row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4">
         {filteredProducts.map(product => (
           <div key={product._id} className="col">
-            <div className="card h-100">
-              <img src={product.image} className="card-img-top" alt={product.title}
-                style={{ height: '200px', objectFit: 'cover' }} />
-              <div className="card-body">
-                <h5 className="card-title">{product.title}</h5>
-                <p className="card-text text-truncate">{product.description}</p>
-                <p className="card-text"><strong>Rs:</strong> {product.price}
-                </p>
-                <button className="btn btn-outline-success float-start btn-sm "
+            <div className="card h-100 border-0">
+              <img src={product.image} 
+              className=" card-img-top rounded-3 p-1" alt={product.title}
+              style={{ border: "1px solid green" }}/>
+              <div className="card-body w-100  rounded-3 mt-1"
+              style={{ backgroundColor: "#f9fff5",border: "1px solid green"}}>
+                <h5 className="card-title text-success">{product.title}</h5>
+                <p className=" card-text text-truncate ">{product.description}</p>
+                <span className=" card-text text-primary"><strong>Rs:</strong> {product.price}
+                </span><br />
+
+                <button className="btn btn-outline-success float-start btn-sm mt-3"
                     onClick={() => navigate(`/product/${product._id}`)}>Detail</button>
               </div>
             </div>
@@ -77,7 +82,7 @@ function Home() {
       </div>
 
       {/* Sticky Bottom Action Bar */}
-      <div className="position-fixed bottom-0 start-0 end-0 bg-light border-top p-2 d-flex justify-content-between gap-3"
+      <div className="position-fixed bottom-0 start-0 end-0 bg-light border-top p-2 d-flex justify-content-center gap-3"
         style={{ zIndex: 999 }}>
         <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔"
           className="btn btn-success d-flex align-items-center gap-2"
