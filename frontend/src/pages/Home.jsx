@@ -33,10 +33,10 @@ function Home() {
   );
 
   return (
-    <div className="container pb-5" >
+    <div className="container pb-5 " >
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="text-success"> Welcome to <FaLeaf /> DarzNursery</h2>
+      <div className="mt-3 px-3 d-flex border justify-content-between align-items-center mb-4">
+        <h2 className="text-success pt-2">  <FaLeaf /> DarzNursery</h2>
         <div className="d-flex gap-3">
           <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔"
             target="_blank" rel="noopener noreferrer">
