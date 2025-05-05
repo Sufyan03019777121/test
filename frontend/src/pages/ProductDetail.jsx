@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { FaArrowLeft, FaPhone, FaWhatsapp } from 'react-icons/fa';
 
-function ProductDetail() {
-  const [product, setProduct] = useState(null);
-  const { id } = useParams();
+function ProductDetail({ products }) {
+  const { id } = useParams();  // get product id from URL params
+  const product = products.find(p => p._id === id);  // find the product
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      const res = await axios.get(`http://localhost:5000/api/products/${id}`);
-      setProduct(res.data);
-    };
-    fetchProduct();
-  }, [id]);
-
-  if (!product) return <div>Loading...</div>;
+  if (!product) return <p>Product not found</p>;  // fallback if no product is found
 
   return (
     <div className="container mt-4">
-      <h2>{product.title}</h2>
-      <img src={product.image} alt={product.title} className="img-fluid" />
-      <p>{product.description}</p>
-      <p>Price: Rs. {product.price}</p>
+      <Link to="/" className="btn btn-outline-secondary mb-3"><FaArrowLeft /> Back</Link>
+      <div className="card">
+        <img src={product.image} className="card-img-top" alt={product.title} style={{ maxHeight: 'auto', objectFit: 'cover' }} />
+        <div className="card-body">
+          <h3>{product.title}</h3>
+          <p>{product.description}</p>
+          <h5>Rs: {product.price}</h5>
+          <div className="d-flex gap-2 mt-3">
+            <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔" className="btn btn-success"><FaWhatsapp /> WhatsApp</a>
+            <a href="tel:+923094282079" className="btn btn-primary"><FaPhone /> Call</a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
