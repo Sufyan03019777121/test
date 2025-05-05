@@ -9,9 +9,6 @@ function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
-
-
-  // Ping sent to backend
   useEffect(() => {
     fetchProducts();
     const interval = setInterval(() => {
@@ -36,13 +33,13 @@ function Home() {
   );
 
   return (
-    <div className="container py-4">
+    <div className="container pb-5" >
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="text-success"> Welcome to <FaLeaf /> DarzNursery</h2>
         <div className="d-flex gap-3">
-          <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔
-  " target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔"
+            target="_blank" rel="noopener noreferrer">
             <FaWhatsapp size={24} className="text-success" />
           </a>
           <a href="tel:+923094282079">
@@ -70,10 +67,9 @@ function Home() {
                 <h5 className="card-title">{product.title}</h5>
                 <p className="card-text text-truncate">{product.description}</p>
                 <p className="card-text"><strong>Rs:</strong> {product.price}
-                  <button className="btn btn-outline-success float-end btn-sm "
-                    onClick={() => navigate(`/product/${product._id}`)}>Details</button>
                 </p>
-
+                <button className="btn btn-outline-success float-start btn-sm "
+                    onClick={() => navigate(`/product/${product._id}`)}>Detail</button>
               </div>
             </div>
           </div>
@@ -81,7 +77,8 @@ function Home() {
       </div>
 
       {/* Sticky Bottom Action Bar */}
-      <div className="position-fixed bottom-0 start-0 end-0 bg-light border-top p-2 d-flex justify-content-between gap-3" style={{ zIndex: 999 }}>
+      <div className="position-fixed bottom-0 start-0 end-0 bg-light border-top p-2 d-flex justify-content-between gap-3"
+        style={{ zIndex: 999 }}>
         <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔"
           className="btn btn-success d-flex align-items-center gap-2"
           target="_blank" rel="noopener noreferrer">
@@ -91,7 +88,6 @@ function Home() {
           <FaPhoneAlt /> Call
         </a>
       </div>
-
     </div>
   );
 }
