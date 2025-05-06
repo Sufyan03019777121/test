@@ -21,7 +21,7 @@ const productSchema = new mongoose.Schema({
   title: String,
   description: String,
   price: Number,
-  image: String,
+  images: [String], // ✅ Updated to accept an array of image URLs
 });
 
 const Product = mongoose.model('Product', productSchema);
@@ -41,11 +41,12 @@ app.get('/products', async (req, res) => {
 // Add new product
 app.post('/add-product', async (req, res) => {
   try {
-    const { title, description, price, image } = req.body;
-    const newProduct = new Product({ title, description, price, image });
+    const { title, description, price, images } = req.body; // ✅ Updated to handle images array
+    const newProduct = new Product({ title, description, price, images });
     await newProduct.save();
     res.json(newProduct);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Failed to add product' });
   }
 });
@@ -54,10 +55,10 @@ app.post('/add-product', async (req, res) => {
 app.put('/edit-product/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, price, image } = req.body;
+    const { title, description, price, images } = req.body; // ✅ Updated to handle images array
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
-      { title, description, price, image },
+      { title, description, price, images },
       { new: true }
     );
     if (!updatedProduct) {
@@ -65,6 +66,7 @@ app.put('/edit-product/:id', async (req, res) => {
     }
     res.json(updatedProduct);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Failed to update product' });
   }
 });
