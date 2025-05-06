@@ -8,51 +8,75 @@ function Admin() {
   const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image: '' });
   const [editProduct, setEditProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
 
-  // Fetch all products
   const fetchProducts = async () => {
     const res = await axios.get('https://demo-backend-ti0w.onrender.com/products');
     setProducts(res.data);
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    if (isAuthenticated) {
+      fetchProducts();
+    }
+  }, [isAuthenticated]);
 
-  // Add new product
   const addProduct = async () => {
     await axios.post('https://demo-backend-ti0w.onrender.com/add-product', newProduct);
     fetchProducts();
     setNewProduct({ title: '', description: '', price: '', image: '' });
   };
 
-  // Update existing product
   const updateProduct = async () => {
     await axios.put(`https://demo-backend-ti0w.onrender.com/edit-product/${editProduct._id}`, editProduct);
     fetchProducts();
     setEditProduct(null);
   };
 
-  // Delete product
   const deleteProduct = async (id) => {
-    // Backend se product delete karna
     await axios.delete(`https://demo-backend-ti0w.onrender.com/delete-product/${id}`);
-    
-    // Frontend se turant product remove karna (Optimistic UI update)
     setProducts(products.filter(p => p._id !== id));
   };
 
-
-  // Filtered products based on search
   const filteredProducts = products.filter(p =>
     p.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handlePasswordCheck = () => {
+    if (passwordInput === '821NS821') {
+      setIsAuthenticated(true);
+    } else {
+      alert('❌ Incorrect Password');
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mt-5">
+        <div className="card p-4 mx-auto" style={{ maxWidth: '400px' }}>
+          <h4 className="text-center mb-3">🔒 Admin Access</h4>
+          <input
+            type="password"
+            className="form-control mb-2"
+            placeholder="Enter Password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+          />
+          <button className="btn btn-primary w-100" onClick={handlePasswordCheck}>
+            Enter
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Full Admin Panel (as-is from your code) ---
   return (
     <div className="container mt-4">
       <h3 className="text-center mb-4">🌿 DarzNursery Admin Panel</h3>
 
-      {/* Add New Product Form */}
+      {/* Add Product Form */}
       <div className="card p-3 mb-4">
         <h5>Add Product <FaPlus /></h5>
         <div className="row g-2">
@@ -113,7 +137,7 @@ function Admin() {
         </div>
       )}
 
-      {/* Product List */}
+      {/* Product Cards */}
       <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
         {filteredProducts.map((product) => (
           <div className="col" key={product._id}>
@@ -123,7 +147,6 @@ function Admin() {
                 <h5 className="card-title">{product.title}</h5>
                 <p className="card-text text-truncate">{product.description}</p>
                 <p className="card-text"><strong>Rs:</strong> {product.price}</p>
-                
               </div>
               <div className="card-footer d-flex justify-content-between">
                 <button className="btn btn-sm btn-danger" onClick={() => deleteProduct(product._id)}><FaTrash /></button>
