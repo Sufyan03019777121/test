@@ -48,7 +48,7 @@ function Home() {
           </a>
         </div>
       </div>
-      <span className="px-3 d-flex shadow justify-content-between align-items-center my-2 text-primary " style={{ backgroundColor: "#fdf6e2" }} >
+      <span className="px-3 pt-1 d-flex shadow justify-content-between align-items-center my-2 text-primary " style={{ backgroundColor: "#fdf6e2" }} >
        <h2>Plants</h2>
        <h2>&</h2>
        <h2>Services</h2>
