@@ -67,7 +67,7 @@ function Admin() {
   );
 
   const handlePasswordCheck = () => {
-    if (passwordInput === '821NS821') {
+    if (passwordInput === '..821NS821..') {
       setIsAuthenticated(true);
     } else {
       alert('❌ Incorrect Password');
