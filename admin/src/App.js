@@ -5,7 +5,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Admin() {
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image: '' });
+  const [newProduct, setNewProduct] = useState({
+    title: '',
+    description: '',
+    price: '',
+    images: [
+      'https://via.placeholder.com/150',
+      'https://via.placeholder.com/150',
+      'https://via.placeholder.com/150',
+      'https://via.placeholder.com/150',
+    ],
+  });
   const [editProduct, setEditProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,21 +35,34 @@ function Admin() {
   const addProduct = async () => {
     await axios.post('https://demo-backend-ti0w.onrender.com/add-product', newProduct);
     fetchProducts();
-    setNewProduct({ title: '', description: '', price: '', image: '' });
+    setNewProduct({
+      title: '',
+      description: '',
+      price: '',
+      images: [
+        '',
+        '',
+        '',
+        '',
+      ],
+    });
   };
 
   const updateProduct = async () => {
-    await axios.put(`https://demo-backend-ti0w.onrender.com/edit-product/${editProduct._id}`, editProduct);
+    await axios.put(
+      `https://demo-backend-ti0w.onrender.com/edit-product/${editProduct._id}`,
+      editProduct
+    );
     fetchProducts();
     setEditProduct(null);
   };
 
   const deleteProduct = async (id) => {
     await axios.delete(`https://demo-backend-ti0w.onrender.com/delete-product/${id}`);
-    setProducts(products.filter(p => p._id !== id));
+    setProducts(products.filter((p) => p._id !== id));
   };
 
-  const filteredProducts = products.filter(p =>
+  const filteredProducts = products.filter((p) =>
     p.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -71,7 +94,6 @@ function Admin() {
     );
   }
 
-  // --- Full Admin Panel (as-is from your code) ---
   return (
     <div className="container mt-4">
       <h3 className="text-center mb-4">🌿 DarzNursery Admin Panel</h3>
@@ -81,31 +103,65 @@ function Admin() {
         <h5>Add Product <FaPlus /></h5>
         <div className="row g-2">
           <div className="col-md">
-            <input className="form-control" type="text" placeholder="Title" value={newProduct.title}
-              onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })} />
+            <input
+              className="form-control"
+              type="text"
+              placeholder="Title"
+              value={newProduct.title}
+              onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+            />
           </div>
           <div className="col-md">
-            <input className="form-control" type="text" placeholder="Description" value={newProduct.description}
-              onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} />
+            <input
+              className="form-control"
+              type="text"
+              placeholder="Description"
+              value={newProduct.description}
+              onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+            />
           </div>
           <div className="col-md">
-            <input className="form-control" type="number" placeholder="Price" value={newProduct.price}
-              onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
+            <input
+              className="form-control"
+              type="number"
+              placeholder="Price"
+              value={newProduct.price}
+              onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+            />
           </div>
           <div className="col-md">
-            <input className="form-control" type="text" placeholder="Image URL" value={newProduct.image}
-              onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })} />
+            {newProduct.images.map((img, index) => (
+              <input
+                key={index}
+                className="form-control mb-2"
+                type="text"
+                placeholder={`Image URL ${index + 1}`}
+                value={img}
+                onChange={(e) => {
+                  const updatedImages = [...newProduct.images];
+                  updatedImages[index] = e.target.value || 'https://via.placeholder.com/150';
+                  setNewProduct({ ...newProduct, images: updatedImages });
+                }}
+              />
+            ))}
           </div>
           <div className="col-md-auto">
-            <button className="btn btn-success w-100" onClick={addProduct}>Add</button>
+            <button className="btn btn-success w-100" onClick={addProduct}>
+              Add
+            </button>
           </div>
         </div>
       </div>
 
       {/* Search Bar */}
       <div className="input-group mb-3">
-        <input type="text" className="form-control" placeholder="Search by name..."
-          value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <span className="input-group-text">Total: {filteredProducts.length}</span>
       </div>
 
@@ -115,42 +171,82 @@ function Admin() {
           <h5>Edit Product</h5>
           <div className="row g-2">
             <div className="col-md">
-              <input className="form-control" type="text" value={editProduct.title}
-                onChange={(e) => setEditProduct({ ...editProduct, title: e.target.value })} />
+              <input
+                className="form-control"
+                type="text"
+                value={editProduct.title}
+                onChange={(e) => setEditProduct({ ...editProduct, title: e.target.value })}
+              />
             </div>
             <div className="col-md">
-              <input className="form-control" type="text" value={editProduct.description}
-                onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })} />
+              <input
+                className="form-control"
+                type="text"
+                value={editProduct.description}
+                onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
+              />
             </div>
             <div className="col-md">
-              <input className="form-control" type="number" value={editProduct.price}
-                onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })} />
+              <input
+                className="form-control"
+                type="number"
+                value={editProduct.price}
+                onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
+              />
             </div>
             <div className="col-md">
-              <input className="form-control" type="text" value={editProduct.image}
-                onChange={(e) => setEditProduct({ ...editProduct, image: e.target.value })} />
+              {editProduct.images?.map((img, index) => (
+                <input
+                  key={index}
+                  className="form-control mb-2"
+                  type="text"
+                  placeholder={`Image URL ${index + 1}`}
+                  value={img}
+                  onChange={(e) => {
+                    const updatedImages = [...editProduct.images];
+                    updatedImages[index] = e.target.value || 'https://via.placeholder.com/150';
+                    setEditProduct({ ...editProduct, images: updatedImages });
+                  }}
+                />
+              ))}
             </div>
             <div className="col-md-auto">
-              <button className="btn btn-primary w-100" onClick={updateProduct}>Update</button>
+              <button className="btn btn-primary w-100" onClick={updateProduct}>
+                Update
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {/* Product Cards */}
-      <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
         {filteredProducts.map((product) => (
           <div className="col" key={product._id}>
             <div className="card h-100">
-              <img src={product.image} className="card-img-top" alt={product.title} style={{ height: 'auto', objectFit: 'cover' }} />
+              <div className="d-flex flex-wrap justify-content-center p-2">
+                {product.images?.map((img, i) => (
+                  <img
+                    key={i}
+                    src={img || 'https://via.placeholder.com/150'}
+                    alt={`product-${i}`}
+                    className="m-1 border"
+                    style={{ width: '45%', height: '100px', objectFit: 'cover' }}
+                  />
+                ))}
+              </div>
               <div className="card-body">
                 <h5 className="card-title">{product.title}</h5>
                 <p className="card-text text-truncate">{product.description}</p>
                 <p className="card-text"><strong>Rs:</strong> {product.price}</p>
               </div>
               <div className="card-footer d-flex justify-content-between">
-                <button className="btn btn-sm btn-danger" onClick={() => deleteProduct(product._id)}><FaTrash /></button>
-                <button className="btn btn-sm btn-warning" onClick={() => setEditProduct(product)}><FaEdit /></button>
+                <button className="btn btn-sm btn-danger" onClick={() => deleteProduct(product._id)}>
+                  <FaTrash />
+                </button>
+                <button className="btn btn-sm btn-warning" onClick={() => setEditProduct(product)}>
+                  <FaEdit />
+                </button>
               </div>
             </div>
           </div>
