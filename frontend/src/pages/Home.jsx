@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaWhatsapp, FaPhoneAlt, FaSearch } from 'react-icons/fa';
@@ -35,8 +36,9 @@ function Home() {
   return (
     <div className="container pb-5 pt-3 bg-light">
       {/* Header */}
-      <div className="px-3 d-flex border justify-content-between align-items-center mb-4" style={{ backgroundColor: "#eafdea" }}>
-        <h2 className="text-success pt-2">🌿 NS_Nursery Sevices</h2>
+      <div className="px-3 d-flex shadow justify-content-between align-items-center " style={{ backgroundColor: "#eafdea" }}>
+        <h2 className="text-success pt-2">🌿 NS_Nursery </h2>
+
         <div className="d-flex gap-3">
           <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔" target="_blank" rel="noopener noreferrer">
             <FaWhatsapp size={24} className="text-success" />
@@ -46,11 +48,16 @@ function Home() {
           </a>
         </div>
       </div>
+      <span className="px-3 d-flex shadow justify-content-between align-items-center my-2 text-primary " style={{ backgroundColor: "#fdf6e2" }} >
+       <h2>Plants</h2>
+       <h2>&</h2>
+       <h2>Services</h2>
+      </span>
 
       {/* Search Bar */}
-      <div className="input-group mb-4">
+      <div className="input-group mb-4 shadow">
         <span className="input-group-text"><FaSearch /></span>
-        <input type="text" className="form-control" placeholder="Search by name..."
+        <input type="text" className="form-control " placeholder="Search by name..."
           value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <span className="input-group-text">Total: {filteredProducts.length}</span>
       </div>
@@ -70,7 +77,7 @@ function Home() {
                       overflow: 'auto',
                       scrollbarWidth: 'none',
                       msOverflowStyle: 'none',
-                      
+
                       margin: "2px",
                       WebkitOverflowScrolling: 'touch',
                     }} >
