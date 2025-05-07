@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaWhatsapp, FaPhoneAlt, FaSearch, FaLeaf } from 'react-icons/fa';
+import { FaWhatsapp, FaPhoneAlt, FaSearch } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,15 +33,12 @@ function Home() {
   );
 
   return (
-    <div   className="container pb-5 pt-3 bg-light " >
+    <div className="container pb-5 pt-3 bg-light">
       {/* Header */}
-      <div className="px-3 d-flex border justify-content-between align-items-center mb-4"
-      style={{ backgroundColor: "#eafdea"}}
-       >
-        <h2 className="text-success pt-2">  🌿 NS_Nursery</h2>
+      <div className="px-3 d-flex border justify-content-between align-items-center mb-4" style={{ backgroundColor: "#eafdea" }}>
+        <h2 className="text-success pt-2">🌿 NS_Nursery</h2>
         <div className="d-flex gap-3">
-          <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔"
-            target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔" target="_blank" rel="noopener noreferrer">
             <FaWhatsapp size={24} className="text-success" />
           </a>
           <a href="tel:+923094282079">
@@ -58,23 +55,50 @@ function Home() {
         <span className="input-group-text">Total: {filteredProducts.length}</span>
       </div>
 
-      {/* Product Cards */}
-      <div className="  row row-cols-2 row-cols-sm-2 row-cols-md-3 g-4">
+      {/* Product Cards with 4 Images */}
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
         {filteredProducts.map(product => (
           <div key={product._id} className="col">
-            <div className="card h-100 border-0">
-              <img src={product.image} 
-              className=" card-img-top rounded-3 p-1" alt={product.title}
-              style={{ border: "1px solid green" }}/>
-              <div className="card-body w-100  rounded-3 mt-1"
-              style={{ backgroundColor: "#f9fff5",border: "1px solid green"}}>
-                <h5 className="card-title text-success">{product.title}</h5>
-                <p className=" card-text text-truncate ">{product.description}</p>
-                <span className=" card-text text-primary"><strong>Rs:</strong> {product.price}
-                </span><br />
+            <div className="card h-100 border-0  shadow" style={{ backgroundColor: "#fcfceb" }}>
+              <div className="card-img-top d-flex  flex-wrap shadow-sm ">
+                {/* Displaying 4 images in a row */}
+                {product.images && product.images.slice(0, 4).map((image, index) => (
+                  <div className='shadow-sm'
+                    style={{
+                      width: '48%',
+                      height: "100px",
+                      overflow: 'auto',
+                      scrollbarWidth: 'none',
+                      msOverflowStyle: 'none',
+                      
+                      margin: "2px",
+                      WebkitOverflowScrolling: 'touch',
+                    }} >
+                    <div
+                      style={{
+                        width: '90%',
+                        height: 'auto',
 
-                <button className="btn btn-outline-success float-start btn-sm mt-3"
-                    onClick={() => navigate(`/product/${product._id}`)}>Detail</button>
+                      }}>
+                      <img key={index} src={image} alt={product.title}
+                        className="m-1 "
+                        style={{ width: '104%', height: 'auto', objectFit: 'cover' }}
+                      />
+                    </div>
+                  </div>
+
+
+
+                ))}
+              </div>
+              <div className="card-body justify-content-between d-flex w-100 rounded-3 mt-1">
+                <h5 className="card-title text-success">{product.title}
+
+                </h5>
+
+
+                <button className="btn btn-outline-success float-start btn-sm "
+                  onClick={() => navigate(`/product/${product._id}`)}>Detail</button>
               </div>
             </div>
           </div>
@@ -82,8 +106,7 @@ function Home() {
       </div>
 
       {/* Sticky Bottom Action Bar */}
-      <div className="position-fixed bottom-0 start-0 end-0 bg-light border-top p-2 d-flex justify-content-center gap-3"
-        style={{ zIndex: 999 }}>
+      <div className="position-fixed bottom-0 start-0 end-0 bg-light border-top p-2 d-flex justify-content-center gap-3" style={{ zIndex: 999 }}>
         <a href="https://wa.me/923094282079?text=السلام%20علیکم%2C%20مجھے%20پودے%20چاہیئے%20ہیں%2C%20رابطہ%20کیجیے۔"
           className="btn btn-success d-flex align-items-center gap-2"
           target="_blank" rel="noopener noreferrer">
