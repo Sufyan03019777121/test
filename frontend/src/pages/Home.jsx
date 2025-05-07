@@ -66,7 +66,7 @@ function Home() {
                   <div className='shadow-sm'
                     style={{
                       width: '48%',
-                      height: "100px",
+                      height: "130px",
                       overflow: 'auto',
                       scrollbarWidth: 'none',
                       msOverflowStyle: 'none',
