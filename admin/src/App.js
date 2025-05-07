@@ -96,7 +96,7 @@ function Admin() {
 
   return (
     <div className="container mt-4">
-      <h3 className="text-center mb-4">🌿 DarzNursery Admin Panel</h3>
+      <h3 className="text-center mb-4">🌿 NS_Nursery Sevices Admin Panel</h3>
 
       {/* Add Product Form */}
       <div className="card p-3 mb-4">
