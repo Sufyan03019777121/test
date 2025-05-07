@@ -10,10 +10,10 @@ function Admin() {
     description: '',
     price: '',
     images: [
-      'https://via.placeholder.com/150',
-      'https://via.placeholder.com/150',
-      'https://via.placeholder.com/150',
-      'https://via.placeholder.com/150',
+      '',
+      '',
+      '',
+      '',
     ],
   });
   const [editProduct, setEditProduct] = useState(null);
